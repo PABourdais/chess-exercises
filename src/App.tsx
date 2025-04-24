@@ -10,7 +10,13 @@ const demoPuzzle: Puzzle = {
 };
 
 function App() {
-  const handleSolved = () => alert("Well done! Puzzle solved.");
+  const handleSolved = (elapsedSeconds: number) => {
+    const minutes = Math.floor(elapsedSeconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (elapsedSeconds % 60).toString().padStart(2, "0");
+    alert(`✅ Well done! You solved it in ${minutes}:${seconds} (mm:ss).`);
+  };
   return (
     <div
       style={{
