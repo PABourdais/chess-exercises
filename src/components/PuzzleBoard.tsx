@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Chess } from "chess.js";
-import { Chessboard } from "react-chessboard";
+import { Chessboard, CustomSquareStyles } from "react-chessboard";
 import type { Puzzle } from "../types";
 
 interface Props {
@@ -15,6 +15,10 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
   const [isSolved, setIsSolved] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const timerRef = useRef<number>();
+  const [showHintSAN, setShowHintSAN] = useState(false);
+  const [highlightSquares, setHighlightSquares] = useState<CustomSquareStyles>(
+    {}
+  );
 
   const startTimer = useCallback(() => {
     window.clearInterval(timerRef.current);
@@ -30,16 +34,33 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
   }, [startTimer]);
 
   const handleSolved = useCallback(() => {
-    console.log("Puzzle solved!");
+    setShowHintSAN(false);
     setIsSolved(true);
     window.clearInterval(timerRef.current);
     onSolved(seconds);
   }, [onSolved, seconds]);
 
+  const giveHint = () => {
+    setShowHintSAN(true);
+    const san = puzzle.solution[moveIndex];
+    const tempGame = new Chess(position);
+    const verboseMoves = tempGame.moves({ verbose: true });
+    const moveObj = verboseMoves.find((m) => m.san === san);
+    if (moveObj) {
+      setHighlightSquares({
+        [moveObj.from]: { background: "rgba(255, 255, 0, 0.6)" },
+        [moveObj.to]: { background: "rgba(255, 255, 0, 0.6)" },
+      });
+      setTimeout(() => {
+        setHighlightSquares({});
+      }, 2000);
+    }
+  };
+
   const onDrop = (from: string, to: string) => {
     const move = game.move({ from, to, promotion: "q" });
     if (!move) return false;
-
+    setShowHintSAN(false);
     if (move.san === puzzle.solution[moveIndex]) {
       setMoveIndex((i) => i + 1);
       setPosition(game.fen());
@@ -55,6 +76,7 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
   };
 
   const resetPuzzle = useCallback(() => {
+    setShowHintSAN(false);
     game.load(puzzle.fen);
     setPosition(puzzle.fen);
     setMoveIndex(0);
@@ -86,7 +108,8 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
       </div>
       <Chessboard
         position={position}
-        onPieceDrop={(from, to) => onDrop(from, to)}
+        onPieceDrop={onDrop}
+        customSquareStyles={highlightSquares}
         boardWidth={480}
       />
       <div
@@ -101,6 +124,13 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
         <p style={{ margin: 0 }}>
           Move {moveIndex + 1} of {puzzle.solution.length}
         </p>
+        <button
+          onClick={giveHint}
+          disabled={showHintSAN || isSolved}
+          style={{ marginRight: "1rem" }}
+        >
+          💡 Hint
+        </button>
         <button onClick={resetPuzzle} style={{ padding: "0.5rem 1rem" }}>
           🔄 Restart Puzzle
         </button>
