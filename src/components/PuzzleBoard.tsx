@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import type { Puzzle } from "../types";
@@ -24,7 +24,6 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
       }
       return true;
     } else {
-      // reset on mistake
       game.load(puzzle.fen);
       setPosition(puzzle.fen);
       setMoveIndex(0);
@@ -32,17 +31,36 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
     }
   };
 
+  const resetPuzzle = useCallback(() => {
+    game.load(puzzle.fen);
+    setPosition(puzzle.fen);
+    setMoveIndex(0);
+  }, [game, puzzle.fen]);
+
   return (
-    <div>
+    <div style={{ textAlign: "center" }}>
       <h2>{puzzle.title || "Chess Puzzle"}</h2>
       <Chessboard
         position={position}
         onPieceDrop={(from, to) => onDrop(from, to)}
         boardWidth={480}
       />
-      <p>
-        Move {moveIndex + 1} of {puzzle.solution.length}
-      </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "480px",
+          margin: "1rem auto 0",
+        }}
+      >
+        <p style={{ margin: 0 }}>
+          Move {moveIndex + 1} of {puzzle.solution.length}
+        </p>
+        <button onClick={resetPuzzle} style={{ padding: "0.5rem 1rem" }}>
+          🔄 Restart Puzzle
+        </button>
+      </div>
     </div>
   );
 }
