@@ -5,3 +5,5 @@ export interface Puzzle {
   title?: string;
   metadata?: Record<string, any>;
 }
+
+export type Category = "Mate in 2" | "Mate in 3";

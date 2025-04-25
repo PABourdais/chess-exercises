@@ -101,9 +101,20 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h2>{puzzle.title || "Chess Puzzle"}</h2>
-      <div style={{ fontSize: "1.25rem", margin: "0.5rem 0" }}>
-        ⏱ {minutes}:{secs}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "480px",
+          marginInline: "auto",
+          marginBottom: "1rem",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>{puzzle.title || "Chess Puzzle"}</h2>
+        <div style={{ fontSize: "1.25rem" }}>
+          ⏱ {minutes}:{secs}
+        </div>
       </div>
       <Chessboard
         position={position}
