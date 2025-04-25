@@ -1,21 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { PuzzleBoard } from "./components/PuzzleBoard";
-import type { Puzzle } from "./types";
-
-const demoPuzzle: Puzzle = {
-  id: "1",
-  fen: "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 3",
-  solution: ["O-O", "Nf6", "Re1", "Be7"],
-  title: "Simple Development Puzzle",
-};
+import { checkmatePuzzles } from "./data/puzzles";
 
 function App() {
+  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState(0);
   const handleSolved = (elapsedSeconds: number) => {
     const minutes = Math.floor(elapsedSeconds / 60)
       .toString()
       .padStart(2, "0");
     const seconds = (elapsedSeconds % 60).toString().padStart(2, "0");
     alert(`✅ Well done! You solved it in ${minutes}:${seconds} (mm:ss).`);
+
+    if (currentPuzzleIndex < checkmatePuzzles.length - 1) {
+      setCurrentPuzzleIndex(currentPuzzleIndex + 1);
+    } else {
+      alert("Congratulations! You've completed all puzzles!");
+      setCurrentPuzzleIndex(0);
+    }
   };
   return (
     <div
@@ -31,7 +32,15 @@ function App() {
         color: "#fff",
       }}
     >
-      <PuzzleBoard puzzle={demoPuzzle} onSolved={handleSolved} />
+      <h1>Checkmate in 2 Moves Puzzles</h1>
+      <p>
+        Puzzle {currentPuzzleIndex + 1} of {checkmatePuzzles.length}
+      </p>
+      <PuzzleBoard
+        key={checkmatePuzzles[currentPuzzleIndex].id}
+        puzzle={checkmatePuzzles[currentPuzzleIndex]}
+        onSolved={handleSolved}
+      />
     </div>
   );
 }

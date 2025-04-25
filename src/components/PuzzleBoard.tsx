@@ -80,7 +80,6 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
     game.load(puzzle.fen);
     setPosition(puzzle.fen);
     setMoveIndex(0);
-    console.log("isSolved? ", isSolved);
     if (isSolved) {
       resetTimer();
       setIsSolved(false);
@@ -126,7 +125,7 @@ export function PuzzleBoard({ puzzle, onSolved }: Props) {
         </p>
         <button
           onClick={giveHint}
-          disabled={showHintSAN || isSolved}
+          disabled={showHintSAN}
           style={{ marginRight: "1rem" }}
         >
           💡 Hint
